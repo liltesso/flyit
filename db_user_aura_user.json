@@ -1,0 +1,244 @@
+{
+  "username": "aura_user",
+  "state": {
+    "profile": {
+      "weight": 74.5,
+      "goal": "bulk",
+      "activity": "medium"
+    },
+    "wakeup": {
+      "2026-07-17": {
+        "isAwake": true,
+        "quote": "Перешкода на шляху стає шляхом. Кожна труднощі — це можливість для зростання.",
+        "author": "Марк Аврелій",
+        "verifiedAt": "2026-07-17T16:36:44.084Z"
+      }
+    },
+    "meals": {
+      "2026-07-17": [],
+      "2026-07-18": []
+    },
+    "sprints": {
+      "2026-07-17": {
+        "ukrainian_1": {
+          "completed": false,
+          "duration": 0
+        },
+        "ukrainian_2": {
+          "completed": false,
+          "duration": 0
+        },
+        "english_1": {
+          "completed": false,
+          "duration": 0
+        },
+        "english_2": {
+          "completed": false,
+          "duration": 0
+        },
+        "history_1": {
+          "completed": false,
+          "duration": 0
+        },
+        "history_2": {
+          "completed": false,
+          "duration": 0
+        },
+        "guitar_1": {
+          "completed": false,
+          "duration": 0
+        },
+        "guitar_2": {
+          "completed": false,
+          "duration": 0
+        }
+      },
+      "2026-07-18": {
+        "ukrainian_1": {
+          "completed": false,
+          "duration": 0
+        },
+        "ukrainian_2": {
+          "completed": false,
+          "duration": 0
+        },
+        "english_1": {
+          "completed": false,
+          "duration": 0
+        },
+        "english_2": {
+          "completed": false,
+          "duration": 0
+        },
+        "history_1": {
+          "completed": false,
+          "duration": 0
+        },
+        "history_2": {
+          "completed": false,
+          "duration": 0
+        },
+        "guitar_1": {
+          "completed": false,
+          "duration": 0
+        },
+        "guitar_2": {
+          "completed": false,
+          "duration": 0
+        }
+      }
+    },
+    "completedToday": {
+      "2026-07-17": [
+        "wakeup"
+      ],
+      "2026-07-18": []
+    },
+    "events": {},
+    "lastOpenedDate": "2026-07-18",
+    "tab": "nutrition",
+    "streak": 0,
+    "vacuumDay": 1,
+    "vacuumStart": 15,
+    "vacuumEnd": 30,
+    "wakeUpTime": "09:00",
+    "kcalTarget": 2523,
+    "proteinTarget": 184,
+    "carbsTarget": 303,
+    "fatTarget": 64,
+    "waterTarget": 2800,
+    "gender": "male",
+    "calcWeight": 80,
+    "calcHeight": 175,
+    "calcAge": 18,
+    "calcFat": 25,
+    "calcActivity": "moderately",
+    "calcGoal": "cut",
+    "waterLogged": 250,
+    "wakeUpCompleted": false,
+    "vacuumCompleted": true,
+    "showerCompleted": false,
+    "duolingoCompleted": false,
+    "studyCompleted": {
+      "english": false,
+      "ukrainian": false,
+      "history": false
+    },
+    "studyFocus": {
+      "english": "Дивитись контент, граматика та словниковий запас",
+      "ukrainian": "Правопис, культура мовлення та літературні тексти",
+      "history": "Періоди, дати, видатні постаті та історичні події"
+    },
+    "customTasks": [
+      {
+        "id": "1",
+        "name": "Прочитати 10 сторінок книги",
+        "completed": false,
+        "recurring": true
+      },
+      {
+        "id": "2",
+        "name": "Випити склянку води перед сном",
+        "completed": false,
+        "recurring": true
+      },
+      {
+        "id": "1784250463986",
+        "name": "ягода",
+        "completed": false,
+        "recurring": true
+      }
+    ],
+    "lastDependencyUseDate": "2026-07-17",
+    "workoutSets": {
+      "morning": {},
+      "evening": {}
+    },
+    "geminiKey": "",
+    "splashSeenToday": true,
+    "history": [],
+    "mealHistory": {},
+    "_saved": "2026-07-17T22:05:59.436Z",
+    "habits": {
+      "2026-07-17": {
+        "mewing_morning": false,
+        "mewing_evening": false,
+        "duolingo": false,
+        "wash_teeth": false,
+        "vacuum": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "2026-07-18": {
+        "mewing_morning": false,
+        "mewing_evening": false,
+        "duolingo": false,
+        "wash_teeth": false,
+        "vacuum": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "water": {
+      "2026-07-17": [
+        {
+          "id": "1784324701319",
+          "time": "00:45",
+          "ml": 250
+        },
+        {
+          "id": "1784324701331",
+          "time": "00:45",
+          "ml": 300
+        },
+        {
+          "id": "1784325959436",
+          "time": "01:05",
+          "ml": 500
+        }
+      ],
+      "2026-07-18": [
+        {
+          "id": "1784324943090",
+          "time": "00:49",
+          "ml": 500
+        },
+        {
+          "id": "1784324943096",
+          "time": "00:49",
+          "ml": 250
+        }
+      ]
+    },
+    "_lastWaterAt": 1784324943096,
+    "weightHistory": [
+      {
+        "date": "2026-07-17",
+        "weight": 74.5
+      }
+    ]
+  },
+  "history": [],
+  "completedToday": {
+    "2026-07-17": [
+      "wakeup"
+    ],
+    "2026-07-18": []
+  },
+  "wakeup": {
+    "2026-07-17": {
+      "isAwake": true,
+      "verifiedAt": "2026-07-17T16:36:44.027Z",
+      "quote": "Перешкода на шляху стає шляхом. Кожна труднощі — це можливість для зростання."
+    }
+  },
+  "events": {}
+}
