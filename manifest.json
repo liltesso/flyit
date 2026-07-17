@@ -1,0 +1,19 @@
+{
+    "name": "AURA — Дисципліна без компромісів",
+    "short_name": "AURA",
+    "description": "Екстремальна система самодисципліни з AI-валідацією",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#000000",
+    "theme_color": "#000000",
+    "orientation": "portrait-primary",
+    "categories": ["productivity", "health", "lifestyle"],
+    "icons": [
+        {
+            "src": "apple-touch-icon.png",
+            "sizes": "180x180",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}
