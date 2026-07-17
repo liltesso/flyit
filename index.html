@@ -1,0 +1,1995 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="description" content="AURA — Екстремальна система самодисципліни з AI-валідацією">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AURA">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="apple-touch-icon-precomposed" href="apple-touch-icon-precomposed.png">
+    <title>AURA — Дисципліна без компромісів</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+/* ══════ DESIGN TOKENS ══════ */
+:root {
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    --bg: #000000;
+    --bg-card: #0a0a0a;
+    --bg-card-2: #111111;
+    --bg-card-3: #1a1a1a;
+    --border: rgba(255,255,255,0.06);
+    --border-active: rgba(255,255,255,0.12);
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255,255,255,0.7);
+    --text-tertiary: rgba(255,255,255,0.4);
+    --accent: #00E676;
+    --accent-dim: rgba(0,230,118,0.15);
+    --accent-glow: rgba(0,230,118,0.3);
+    --danger: #FF3B30;
+    --danger-dim: rgba(255,59,48,0.15);
+    --warning: #FF9500;
+    --warning-dim: rgba(255,149,0,0.15);
+    --info: #007AFF;
+    --info-dim: rgba(0,122,255,0.15);
+    --purple: #BF5AF2;
+    --purple-dim: rgba(191,90,242,0.15);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --radius-xs: 6px;
+    --safe-top: env(safe-area-inset-top);
+    --safe-bottom: env(safe-area-inset-bottom);
+    --nav-height: 72px;
+}
+
+/* ══════ RESET ══════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+    height: 100%; background: var(--bg); color: var(--text-primary);
+    font-family: var(--font); -webkit-font-smoothing: antialiased;
+    overflow: hidden; position: fixed; width: 100%;
+}
+body { font-size: 16px; line-height: 1.45; letter-spacing: -0.01em; }
+* { -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+input, textarea, select, [contenteditable] { -webkit-user-select: text; user-select: text; }
+
+/* ══════ SCROLLBAR ══════ */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+/* ══════ GLASS ══════ */
+.glass {
+    background: rgba(10,10,10,0.8);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border: 1px solid var(--border);
+}
+
+/* ══════ ANIMATIONS ══════ */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+@keyframes pulseGlow { 0%,100%{box-shadow:0 0 8px var(--accent-glow)} 50%{box-shadow:0 0 20px var(--accent-glow)} }
+@keyframes sirenPulse {
+    0%,100% { background-position: 0% 50%; box-shadow: 0 0 30px rgba(255,59,48,0.4); }
+    50% { background-position: 100% 50%; box-shadow: 0 0 50px rgba(255,59,48,0.6); }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ══════ LAYOUT ══════ */
+#app { display: flex; flex-direction: column; height: 100vh; width: 100%; }
+.app-header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding-top: var(--safe-top);
+}
+.view-container {
+    flex: 1; overflow-y: auto; scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: calc(var(--nav-height) + var(--safe-bottom) + 16px);
+}
+.bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+    display: flex; padding-bottom: var(--safe-bottom);
+    border-top: 1px solid var(--border);
+}
+
+/* ══════ COMPONENTS ══════ */
+.card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; margin-bottom: 12px;
+}
+.btn-primary {
+    background: var(--accent); color: #000; font-weight: 700;
+    border-radius: var(--radius-sm); padding: 14px 24px; border: none;
+    width: 100%; font-size: 16px; font-family: var(--font);
+    cursor: pointer; transition: transform 0.1s, opacity 0.2s;
+}
+.btn-primary:active { transform: scale(0.97); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-danger {
+    background: var(--danger); color: #fff; font-weight: 700;
+    border-radius: var(--radius-sm); padding: 14px 24px; border: none;
+    width: 100%; font-size: 16px; font-family: var(--font); cursor: pointer;
+    transition: transform 0.1s;
+}
+.btn-danger:active { transform: scale(0.97); }
+.btn-outline {
+    background: transparent; border: 1px solid var(--border-active);
+    color: var(--text-primary); border-radius: var(--radius-sm);
+    padding: 14px 24px; width: 100%; font-size: 16px;
+    font-family: var(--font); font-weight: 600; cursor: pointer;
+    transition: transform 0.1s;
+}
+.btn-outline:active { transform: scale(0.97); }
+.input-field {
+    background: var(--bg-card-2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px 16px;
+    color: #fff; font-size: 16px; width: 100%; font-family: var(--font);
+    transition: border-color 0.2s;
+}
+.input-field:focus { border-color: var(--accent); outline: none; }
+.input-field::placeholder { color: var(--text-tertiary); }
+textarea.input-field { min-height: 100px; resize: vertical; line-height: 1.5; }
+
+select.input-field {
+    -webkit-appearance: none; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='rgba(255,255,255,0.4)' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center;
+}
+
+/* ══════ TOAST ══════ */
+.toast {
+    position: fixed; top: calc(var(--safe-top) + 12px); left: 16px; right: 16px;
+    padding: 14px 18px; border-radius: var(--radius-sm); z-index: 10000;
+    font-size: 14px; font-weight: 600; transform: translateY(-120px);
+    transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    pointer-events: none;
+}
+.toast.show { transform: translateY(0); pointer-events: auto; }
+.toast.success { background: #0a3d1f; border: 1px solid rgba(0,230,118,0.3); color: var(--accent); }
+.toast.error { background: #3d0a0a; border: 1px solid rgba(255,59,48,0.3); color: var(--danger); }
+
+/* ══════ NAV ══════ */
+.nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    gap: 2px; padding: 10px 0 6px; border: none; background: none;
+    color: var(--text-tertiary); font-family: var(--font); cursor: pointer;
+    transition: color 0.2s;
+}
+.nav-item.active { color: var(--accent); }
+.nav-icon { font-size: 22px; line-height: 1; }
+.nav-label { font-size: 10px; font-weight: 600; }
+
+/* ══════ VIEW ══════ */
+.view { animation: fadeIn 0.25s ease; }
+
+/* ══════ iOS SIREN BUTTON ══════ */
+.ios-siren-btn {
+    display: block; width: 100%; padding: 20px;
+    background: linear-gradient(135deg, #FF3B30 0%, #FF6B35 50%, #FF3B30 100%);
+    background-size: 200% 200%; animation: sirenPulse 2s ease-in-out infinite;
+    border: 2px solid rgba(255,59,48,0.5); border-radius: var(--radius);
+    color: white; font-size: 18px; font-weight: 800; text-decoration: none;
+    text-align: center; letter-spacing: 0.5px; text-transform: uppercase;
+    box-shadow: 0 0 30px rgba(255,59,48,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+    transition: transform 0.15s;
+}
+.ios-siren-btn:active { transform: scale(0.96); }
+.ios-siren-btn .siren-icon { font-size: 28px; display: block; margin-bottom: 6px; }
+.ios-siren-btn .siren-sub { font-size: 12px; font-weight: 400; opacity: 0.8; margin-top: 4px; display: block; }
+
+/* ══════ HEATMAP ══════ */
+.heatmap-cell {
+    aspect-ratio: 1; border-radius: 3px; min-width: 0;
+    transition: background 0.2s; cursor: pointer;
+    position: relative; display: flex; align-items: center; justify-content: center;
+}
+.heatmap-dot-container {
+    position: absolute; bottom: 2px; left: 0; right: 0;
+    display: flex; justify-content: center; gap: 2px;
+    pointer-events: none;
+}
+.heatmap-dot {
+    width: 4px; height: 4px; border-radius: 50%; display: inline-block;
+}
+.heatmap-dot.gym { background-color: var(--danger); }
+.heatmap-dot.other { background-color: var(--info); }
+.heatmap-dot.vacuum { background-color: var(--warning); }
+.heatmap-cell.gym-day {
+    border: 1px solid rgba(255, 59, 48, 0.45) !important;
+}
+.heatmap-cell.level-0.gym-day {
+    background-color: #1e0909;
+}
+.heatmap-cell.level-0.gym-day:hover {
+    background-color: #2b0d0d;
+}
+.heatmap-cell.level-0 { background: #161b22; }
+.heatmap-cell.level-0:hover { background: #21262d; }
+.heatmap-cell.level-1 { background: #0e4429; }
+.heatmap-cell.level-2 { background: #006d32; }
+.heatmap-cell.level-3 { background: #26a641; }
+.heatmap-cell.level-4 { background: #39d353; }
+.heatmap-cell.future { background: transparent; border: 1px solid rgba(255,255,255,0.03); cursor: default; }
+.heatmap-cell.today { outline: 2px solid var(--accent); outline-offset: 1px; }
+.heatmap-label { font-size: 10px; color: var(--text-tertiary); text-align: center; line-height: 14px; }
+
+/* ══════ DAILY TASKS ══════ */
+.daily-task-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 0; border-bottom: 1px solid var(--border);
+}
+.daily-task-item:last-child { border-bottom: none; }
+.daily-task-check {
+    width: 26px; height: 26px; border-radius: 50%;
+    border: 2px solid var(--border-active); background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all 0.2s; cursor: pointer;
+    color: transparent; font-size: 13px;
+}
+.daily-task-check.done { background: var(--accent); border-color: var(--accent); color: #000; }
+.daily-task-name { font-size: 15px; flex: 1; }
+.daily-task-name.done { text-decoration: line-through; color: var(--text-tertiary); }
+
+/* ══════ SPRINT TIMER ══════ */
+.sprint-timer-ring {
+    width: 240px; height: 240px; border-radius: 50%;
+    background: conic-gradient(var(--accent) calc(var(--progress, 0) * 1%), var(--bg-card-3) 0%);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto; position: relative;
+}
+.sprint-timer-inner {
+    width: 210px; height: 210px; border-radius: 50%;
+    background: var(--bg); display: flex; align-items: center;
+    justify-content: center; flex-direction: column;
+}
+.sprint-timer-text { font-size: 48px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.sprint-timer-label { font-size: 13px; color: var(--text-tertiary); margin-top: 4px; }
+.sprint-failed { animation: shake 0.5s; }
+.sprint-focus-indicator {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 16px; border-radius: 20px; font-size: 13px; margin-top: 16px;
+}
+.sprint-focus-indicator.focused { background: var(--accent-dim); color: var(--accent); }
+.sprint-focus-indicator.unfocused { background: var(--danger-dim); color: var(--danger); }
+
+.sprint-task-card {
+    padding: 16px; border-radius: var(--radius-sm);
+    background: var(--bg-card-2); border: 1px solid var(--border);
+    text-align: center; cursor: pointer; transition: all 0.2s;
+}
+.sprint-task-card:active { transform: scale(0.96); }
+.sprint-task-card.completed { border-color: var(--accent); background: var(--accent-dim); }
+.sprint-task-card .task-emoji { font-size: 28px; margin-bottom: 6px; display: block; }
+.sprint-task-card .task-name { font-size: 13px; font-weight: 600; }
+.sprint-task-card .task-done { font-size: 11px; color: var(--accent); margin-top: 4px; }
+
+/* ══════ NUTRITION ══════ */
+.macro-bar { display: flex; gap: 8px; margin-top: 12px; }
+.macro-item {
+    flex: 1; padding: 12px 8px; border-radius: var(--radius-sm);
+    text-align: center; background: var(--bg-card-2);
+}
+.macro-value { font-size: 22px; font-weight: 800; }
+.macro-label { font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+.macro-item.cal .macro-value { color: var(--warning); }
+.macro-item.protein .macro-value { color: var(--accent); }
+.macro-item.fat .macro-value { color: var(--purple); }
+.macro-item.carbs .macro-value { color: var(--info); }
+.recipe-step { padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; gap: 12px; align-items: flex-start; }
+.recipe-step:last-child { border-bottom: none; }
+.recipe-step-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--accent-dim); color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px; flex-shrink: 0;
+}
+.recipe-warning {
+    background: var(--danger-dim); border: 1px solid rgba(255,59,48,0.3);
+    border-radius: var(--radius-sm); padding: 14px; margin-top: 12px;
+    color: var(--danger); font-weight: 600; font-size: 14px;
+}
+
+.meal-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+}
+.meal-item:last-child { border-bottom: none; }
+.meal-type-badge {
+    font-size: 11px; padding: 3px 8px; border-radius: 4px;
+    background: var(--bg-card-2); color: var(--text-secondary); margin-top: 2px; display: inline-block;
+}
+
+/* ══════ WAKE-UP ══════ */
+.wakeup-overlay {
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--bg); display: flex; flex-direction: column;
+    padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 20px);
+    overflow-y: auto; -webkit-overflow-scrolling: touch;
+}
+.wakeup-quote-block {
+    background: var(--bg-card); border: 1px solid var(--accent-dim);
+    border-left: 3px solid var(--accent); border-radius: var(--radius-sm);
+    padding: 24px 20px; margin: 20px 0;
+}
+.wakeup-quote-text { font-size: 20px; font-weight: 600; line-height: 1.5; font-style: italic; }
+.wakeup-quote-author { font-size: 14px; color: var(--accent); margin-top: 12px; font-weight: 500; }
+.wakeup-status { text-align: center; padding: 16px; border-radius: var(--radius-sm); margin-top: 12px; font-size: 14px; }
+.wakeup-status.success { background: var(--accent-dim); color: var(--accent); }
+.wakeup-status.error { background: var(--danger-dim); color: var(--danger); }
+.wakeup-status.loading { background: var(--info-dim); color: var(--info); }
+.char-counter { font-size: 12px; color: var(--text-tertiary); text-align: right; margin-top: 4px; }
+
+/* ══════ MODAL ══════ */
+.modal-overlay {
+    position: fixed; inset: 0; z-index: 5000;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px); display: flex; padding: 16px;
+}
+
+/* ══════ SPINNER ══════ */
+.spinner {
+    display: inline-block; width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-top-color: currentColor; border-radius: 50%;
+    animation: spin 0.6s linear infinite; vertical-align: middle;
+}
+
+/* ══════ SECTION LABEL ══════ */
+.section-label {
+    font-size: 13px; color: var(--text-tertiary); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 14px; font-weight: 600;
+}
+
+/* ══════ EVENT PLANNER ══════ */
+.event-item {
+    display: flex; justify-content: space-between; align-items: center;
+    background: var(--bg-card-2); border: 1px solid var(--border);
+    border-radius: var(--radius-xs); padding: 10px 14px; margin-bottom: 8px;
+}
+.event-time { font-weight: 700; color: var(--accent); font-size: 14px; margin-right: 10px; }
+.event-text { flex: 1; font-size: 14px; color: var(--text-secondary); }
+.event-del-btn { background: none; border: none; color: var(--danger); font-size: 18px; cursor: pointer; padding: 0 4px; }
+
+.event-block {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+}
+.event-block:last-child { border-bottom: none; }
+</style>
+</head>
+<body>
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<!-- Wake-Up Challenge Overlay -->
+<div id="wakeup-overlay" class="wakeup-overlay" style="display:none;">
+    <div style="text-align:center; margin-bottom:24px;">
+        <div style="font-size:48px;">⏰</div>
+        <h1 style="font-size:28px; font-weight:900; margin-top:8px;">ПРОКИДАЙСЯ</h1>
+        <p style="color:var(--text-secondary); font-size:14px; margin-top:4px;">Доведи, що ти не спиш</p>
+    </div>
+    <div class="wakeup-quote-block">
+        <div class="wakeup-quote-text" id="wakeup-quote-text">Завантаження цитати...</div>
+        <div class="wakeup-quote-author" id="wakeup-quote-author"></div>
+    </div>
+    <div style="margin-top:16px;">
+        <label class="section-label">Крок 1: Передрукуй цитату</label>
+        <textarea id="wakeup-typed-quote" class="input-field" placeholder="Введи цитату точно як написано вище..." style="margin-top:8px;"></textarea>
+        <div class="char-counter" id="wakeup-char-counter">0 символів</div>
+    </div>
+    <div style="margin-top:20px;">
+        <label class="section-label">Крок 2: Напиши рефлексію (мін. 2 речення)</label>
+        <textarea id="wakeup-reflection" class="input-field" placeholder="Що ця цитата значить для тебе сьогодні? Мінімум 2 розгорнутих речення..." style="margin-top:8px; min-height:120px;"></textarea>
+        <div class="char-counter" id="wakeup-reflection-counter">0 символів</div>
+    </div>
+    <div id="wakeup-status" class="wakeup-status" style="display:none;"></div>
+    <button id="wakeup-submit-btn" class="btn-primary" style="margin-top:20px;" onclick="submitWakeup()">🔓 ПІДТВЕРДИТИ ПРОБУДЖЕННЯ</button>
+    <button class="btn-outline" style="margin-top:8px; color:var(--text-tertiary);" onclick="closeWakeup()">Закрити</button>
+</div>
+
+<!-- Main App -->
+<div id="app" style="display:none;">
+    <header class="app-header glass">
+        <div style="display:flex; align-items:center; justify-content:space-between; height:56px; padding:0 16px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:22px;">🔥</span>
+                <span style="font-size:18px; font-weight:800; letter-spacing:-0.5px;">AURA</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px;">
+                <div id="sync-dot" style="width:8px; height:8px; border-radius:50%; background:var(--accent);"></div>
+                <span id="header-username" style="font-size:13px; color:var(--text-secondary);">aura_user</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="view-container" id="view-container">
+        <!-- Dashboard -->
+        <section id="view-dashboard" class="view">
+            <div style="padding:16px; padding-top:calc(56px + var(--safe-top) + 12px);">
+                <!-- iOS Siren Button -->
+                <button class="ios-siren-btn" id="ios-siren-btn" onclick="openShortcutInstructions()" style="cursor:pointer; border-radius: var(--radius); outline:none; border: 2px solid rgba(255,59,48,0.5);">
+                    <span class="siren-icon">🚨</span>
+                    ВСТАНОВИТИ iOS СИРЕНУ
+                    <span class="siren-sub">Натисни для завантаження iOS Shortcut — безжальний будильник</span>
+                </button>
+
+                <!-- Wake-Up Card -->
+                <div class="card" id="wakeup-card" style="margin-top:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <div class="section-label" style="margin-bottom:4px;">Пробудження</div>
+                            <div id="wakeup-status-text" style="font-size:20px; font-weight:800;">⏳ Не підтверджено</div>
+                        </div>
+                        <button class="btn-outline" style="padding:10px 16px; font-size:13px; width:auto;" onclick="openWakeupChallenge()">Пройти</button>
+                    </div>
+                </div>
+
+                <!-- Streak & Upcoming Events Tracker -->
+                <div class="card" style="margin-top:4px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                        <div class="section-label" style="margin-bottom:0;">Розклад та Події</div>
+                        <div style="font-size:14px; font-weight:700; color:var(--accent);" id="dashboard-streak-text">🔥 0 днів</div>
+                    </div>
+                    <div id="dashboard-upcoming-events">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+
+                <!-- Daily Tasks -->
+                <div class="card" style="margin-top:4px;">
+                    <div class="section-label">Сьогоднішні завдання</div>
+                    <div id="daily-tasks-list"></div>
+                </div>
+
+                <!-- Vacuum Sets Card -->
+                <div class="card" style="margin-top:4px;">
+                    <div class="section-label" style="margin-bottom:4px;">🌬️ Вакуум живота</div>
+                    <div style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">Ціль: 30 сек / підхід</div>
+                    <div style="display:flex; gap:8px;">
+                        <div style="flex:1; text-align:center;">
+                            <span style="font-size:11px; color:var(--text-tertiary); font-weight: 600;">П1</span>
+                            <input type="number" id="vacuum-input-0" class="input-field" style="padding: 8px; text-align:center; font-size:14px; margin-top:4px;" min="0" placeholder="0" onchange="saveVacuumSet(0, this.value)">
+                        </div>
+                        <div style="flex:1; text-align:center;">
+                            <span style="font-size:11px; color:var(--text-tertiary); font-weight: 600;">П2</span>
+                            <input type="number" id="vacuum-input-1" class="input-field" style="padding: 8px; text-align:center; font-size:14px; margin-top:4px;" min="0" placeholder="0" onchange="saveVacuumSet(1, this.value)">
+                        </div>
+                        <div style="flex:1; text-align:center;">
+                            <span style="font-size:11px; color:var(--text-tertiary); font-weight: 600;">П3</span>
+                            <input type="number" id="vacuum-input-2" class="input-field" style="padding: 8px; text-align:center; font-size:14px; margin-top:4px;" min="0" placeholder="0" onchange="saveVacuumSet(2, this.value)">
+                        </div>
+                        <div style="flex:1; text-align:center;">
+                            <span style="font-size:11px; color:var(--text-tertiary); font-weight: 600;">П4</span>
+                            <input type="number" id="vacuum-input-3" class="input-field" style="padding: 8px; text-align:center; font-size:14px; margin-top:4px;" min="0" placeholder="0" onchange="saveVacuumSet(3, this.value)">
+                        </div>
+                        <div style="flex:1; text-align:center;">
+                            <span style="font-size:11px; color:var(--text-tertiary); font-weight: 600;">П5</span>
+                            <input type="number" id="vacuum-input-4" class="input-field" style="padding: 8px; text-align:center; font-size:14px; margin-top:4px;" min="0" placeholder="0" onchange="saveVacuumSet(4, this.value)">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Heatmap Calendar -->
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                        <div class="section-label" style="margin-bottom:0;">Календар дисципліни</div>
+                        <span style="font-size:11px; color:var(--text-tertiary);">Клікни на день для планування подій</span>
+                    </div>
+                    <div id="heatmap-months" style="display:flex; margin-bottom:4px; padding-left:20px;"></div>
+                    <div style="display:flex; gap:3px;">
+                        <div style="display:flex; flex-direction:column; gap:3px; padding-right:4px; width:16px;">
+                            <div class="heatmap-label" style="height:14px;"></div>
+                            <div class="heatmap-label">Пн</div>
+                            <div class="heatmap-label" style="height:14px;"></div>
+                            <div class="heatmap-label">Ср</div>
+                            <div class="heatmap-label" style="height:14px;"></div>
+                            <div class="heatmap-label">Пт</div>
+                            <div class="heatmap-label" style="height:14px;"></div>
+                        </div>
+                        <div id="heatmap-grid" style="flex:1; display:grid; gap:3px;"></div>
+                    </div>
+                    <div style="display:flex; align-items:center; justify-content:flex-end; gap:4px; margin-top:8px; font-size:10px; color:var(--text-tertiary);">
+                        <span>Менше</span>
+                        <div class="heatmap-cell level-0" style="width:12px; height:12px; display:inline-block;"></div>
+                        <div class="heatmap-cell level-1" style="width:12px; height:12px; display:inline-block;"></div>
+                        <div class="heatmap-cell level-2" style="width:12px; height:12px; display:inline-block;"></div>
+                        <div class="heatmap-cell level-3" style="width:12px; height:12px; display:inline-block;"></div>
+                        <div class="heatmap-cell level-4" style="width:12px; height:12px; display:inline-block;"></div>
+                        <span>Більше</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Nutrition -->
+        <section id="view-nutrition" class="view" style="display:none;">
+            <div style="padding:16px; padding-top:calc(56px + var(--safe-top) + 12px);">
+                <h2 style="font-size:24px; font-weight:800; margin-bottom:16px;">🍽️ AI-Харчування</h2>
+                <div class="card">
+                    <div class="section-label">Конструктор страв</div>
+                    <input id="recipe-ingredients" class="input-field" placeholder="Введи продукти: яйця, лаваш, сир..." style="margin-bottom:10px;">
+                    <button class="btn-primary" onclick="generateRecipe()" id="recipe-gen-btn">🧠 Згенерувати рецепт</button>
+                </div>
+                <div id="recipe-result" class="card" style="display:none;">
+                    <h3 id="recipe-name" style="font-size:20px; font-weight:800;"></h3>
+                    <div class="macro-bar" id="recipe-macros"></div>
+                    <div id="recipe-warning"></div>
+                    <div id="recipe-steps" style="margin-top:16px;"></div>
+                </div>
+                <div class="card" style="margin-top:4px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                        <div class="section-label" style="margin-bottom:0;">Прийоми їжі</div>
+                        <div id="total-calories" style="font-size:14px; font-weight:700; color:var(--warning);">0 kcal</div>
+                    </div>
+                    <div id="meals-list"></div>
+                    <button class="btn-outline" style="margin-top:12px;" onclick="addMealPrompt()">+ Додати прийом їжі</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sprint -->
+        <section id="view-sprint" class="view" style="display:none;">
+            <div style="padding:16px; padding-top:calc(56px + var(--safe-top) + 12px);">
+                <h2 style="font-size:24px; font-weight:800; margin-bottom:16px;">⏱️ Спринт-трекер</h2>
+                <div class="card" id="sprint-selector">
+                    <div class="section-label">Обери завдання</div>
+                    <div id="sprint-tasks-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:8px;"></div>
+                </div>
+                <div id="sprint-active" class="card" style="display:none; text-align:center;">
+                    <div class="section-label" id="sprint-task-name" style="margin-bottom:20px;"></div>
+                    <div class="sprint-timer-ring" id="sprint-ring">
+                        <div class="sprint-timer-inner">
+                            <div class="sprint-timer-text" id="sprint-time">45:00</div>
+                            <div class="sprint-timer-label" id="sprint-label">ЗАЛИШИЛОСЬ</div>
+                        </div>
+                    </div>
+                    <div class="sprint-focus-indicator focused" id="sprint-focus">
+                        <div style="width:8px; height:8px; border-radius:50%; background:currentColor;"></div>
+                        <span id="sprint-focus-text">У фокусі</span>
+                    </div>
+                    <button class="btn-danger" style="margin-top:20px;" onclick="cancelSprint()">Скасувати спринт</button>
+                </div>
+                <div class="card" style="margin-top:4px;">
+                    <div class="section-label">Сьогодні завершено</div>
+                    <div id="sprint-history"><p style="color:var(--text-tertiary); font-size:14px;">Ще немає завершених спринтів</p></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Profile -->
+        <section id="view-profile" class="view" style="display:none;">
+            <div style="padding:16px; padding-top:calc(56px + var(--safe-top) + 12px);">
+                <h2 style="font-size:24px; font-weight:800; margin-bottom:16px;">⚙️ Профіль</h2>
+                <div class="card">
+                    <div class="section-label">Фізичні дані</div>
+                    <label style="font-size:13px; color:var(--text-secondary); margin-bottom:4px; display:block;">Вага (кг)</label>
+                    <input id="profile-weight" class="input-field" type="number" placeholder="75" style="margin-bottom:12px;" onchange="saveProfile()">
+                    <label style="font-size:13px; color:var(--text-secondary); margin-bottom:4px; display:block;">Ціль</label>
+                    <select id="profile-goal" class="input-field" style="margin-bottom:12px;" onchange="saveProfile()">
+                        <option value="bulk">Набір маси</option>
+                        <option value="cut">Сушка / Схуднення</option>
+                        <option value="maintain">Підтримка</option>
+                    </select>
+                    <label style="font-size:13px; color:var(--text-secondary); margin-bottom:4px; display:block;">Рівень активності</label>
+                    <select id="profile-activity" class="input-field" onchange="saveProfile()">
+                        <option value="low">Низький (сидяча робота)</option>
+                        <option value="medium">Середній (3-4 тренування/тижд.)</option>
+                        <option value="high">Високий (щоденні тренування)</option>
+                    </select>
+                </div>
+                <div class="card">
+                    <div class="section-label">Система</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; margin-bottom: 10px;">
+                        <span style="color:var(--text-secondary);">Користувач</span>
+                        <span style="font-weight:600; color:var(--accent);">aura_user (Single User)</span>
+                    </div>
+                    <button class="btn-outline" style="border-color: rgba(255, 59, 48, 0.2); color: var(--danger);" onclick="resetAllData()">Очистити всі локальні дані</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <nav class="bottom-nav glass">
+        <button class="nav-item active" onclick="switchView('dashboard')" id="nav-dashboard">
+            <span class="nav-icon">🏠</span><span class="nav-label">Головна</span>
+        </button>
+        <button class="nav-item" onclick="switchView('nutrition')" id="nav-nutrition">
+            <span class="nav-icon">🍽️</span><span class="nav-label">Їжа</span>
+        </button>
+        <button class="nav-item" onclick="switchView('sprint')" id="nav-sprint">
+            <span class="nav-icon">⏱️</span><span class="nav-label">Спринт</span>
+        </button>
+        <button class="nav-item" onclick="switchView('profile')" id="nav-profile">
+            <span class="nav-icon">⚙️</span><span class="nav-label">Профіль</span>
+        </button>
+    </nav>
+</div>
+
+<!-- Meal Modal -->
+<div id="meal-modal" class="modal-overlay" style="display:none;">
+    <div class="card" style="margin:auto; max-width:360px; width:calc(100% - 32px);">
+        <h3 style="font-size:18px; font-weight:700; margin-bottom:16px;">Додати прийом їжі</h3>
+        <select id="meal-type" class="input-field" style="margin-bottom:10px;">
+            <option value="breakfast">🌅 Сніданок</option>
+            <option value="lunch">☀️ Обід</option>
+            <option value="dinner">🌙 Вечеря</option>
+            <option value="snack">🍎 Перекус</option>
+        </select>
+        <input id="meal-name" class="input-field" placeholder="Назва страви" style="margin-bottom:10px;">
+        <div style="display:flex; gap:8px;">
+            <input id="meal-calories" class="input-field" type="number" placeholder="Калорії" style="flex:1;">
+            <input id="meal-protein" class="input-field" type="number" placeholder="Білок (г)" style="flex:1;">
+        </div>
+        <div style="display:flex; gap:8px; margin-top:8px;">
+            <input id="meal-fat" class="input-field" type="number" placeholder="Жири (г)" style="flex:1;">
+            <input id="meal-carbs" class="input-field" type="number" placeholder="Вугл. (г)" style="flex:1;">
+        </div>
+        <div style="display:flex; gap:8px; margin-top:16px;">
+            <button class="btn-outline" style="flex:1;" onclick="closeMealModal()">Скасувати</button>
+            <button class="btn-primary" style="flex:1;" onclick="saveMeal()">Зберегти</button>
+        </div>
+    </div>
+</div>
+
+<!-- iOS Shortcut Modal -->
+<div id="shortcut-modal" class="modal-overlay" style="display:none;">
+    <div class="card" style="margin:auto; max-width:390px; width:calc(100% - 32px); overflow-y:auto; max-height:85vh; padding:20px 16px;">
+        <h3 style="font-size:18px; font-weight:700; margin-bottom:12px; color:var(--accent);">📱 iOS ІНТЕГРАЦІЯ «ДИСЦИПЛІНА»</h3>
+        
+        <p style="font-size:14px; color:var(--text-secondary); margin-bottom:16px; line-height:1.4;">
+            Швидка команда <strong>Дисципліна</strong> інтегрує ваш iPhone 12 з веб-додатком. Вона контролює ранковий підйом, озвучує невиконані вправи та дозволяє записувати швидкі замітки прямо в календар.
+        </p>
+
+        <div style="font-size:13px; margin-bottom:12px; line-height:1.4;">
+            <strong style="color:var(--warning);">1. Завантажте Швидку Команду:</strong><br>
+            Назвіть завантажену команду строго <strong style="color:var(--accent);">Дисципліна</strong> на вашому iPhone.<br>
+            <a href="https://www.icloud.com/shortcuts/6b3ef9a5840d463d80b7d8d21c97a5a3" id="shortcut-download-link" style="color:var(--info); font-weight:600; text-decoration:underline; display:inline-block; margin-top:4px;" target="_blank" rel="noopener">Завантажити команду «Дисципліна»</a>
+        </div>
+
+        <div style="font-size:13px; margin-bottom:12px;">
+            <strong style="color:var(--warning);">2. Скопіюйте свій API Webhook URL:</strong><br>
+            Вставте це посилання всередину швидкої команди:<br>
+            <div style="display:flex; gap:6px; margin-top:6px;">
+                <input id="shortcut-webhook-url" class="input-field" readonly style="font-size:12px; padding:8px; height:auto; background:var(--bg-card-3);" value="">
+                <button class="btn-primary" style="width:auto; padding:8px 12px; font-size:12px;" onclick="copyShortcutLink()">Копіювати</button>
+            </div>
+        </div>
+
+        <div style="font-size:13px; margin-bottom:16px; line-height:1.4;">
+            <strong style="color:var(--warning);">3. Налаштування Будильника (09:00):</strong><br>
+            Створіть автоматизацію в додатку "Швидкі команди":<br>
+            <ul style="padding-left:16px; margin-top:4px; display:flex; flex-direction:column; gap:4px;">
+                <li>Час доби: <strong>09:00</strong> щоденно.</li>
+                <li>Запуск: <strong>Негайно</strong> (без запиту).</li>
+                <li>Дія: Запустити команду <strong>«Дисципліна»</strong>.</li>
+            </ul>
+            <span style="font-size:11px; color:var(--text-tertiary);">Siri озвучить ваші борги (зуби, м'юїнг, вакуум або навчання) та увімкне сирену при порушенні.</span>
+        </div>
+
+        <div style="font-size:13px; margin-bottom:16px; line-height:1.4;">
+            <strong style="color:var(--warning);">4. Додавання у Пункт Керування (Зверху):</strong><br>
+            Щоб запускати команду з верхньої панелі iPhone (де ліхтарик, інтернет):<br>
+            <ul style="padding-left:16px; margin-top:4px; display:flex; flex-direction:column; gap:4px;">
+                <li>Відкрийте <strong>Параметри (Settings) → Пункт керування (Control Center)</strong>.</li>
+                <li>Додайте елемент <strong>«Швидкі команди»</strong> (Shortcuts).</li>
+                <li>Виберіть команду <strong>«Дисципліна»</strong> для відображення як віджета.</li>
+            </ul>
+        </div>
+
+        <div style="font-size:13px; margin-bottom:16px; line-height:1.4;">
+            <strong style="color:var(--warning);">5. Додаткові швидкі команди iPhone:</strong><br>
+            Ви можете налаштувати кнопки швидкої дії на робочому столі або віджетах:<br>
+            <ul style="padding-left:16px; margin-top:4px; display:flex; flex-direction:column; gap:8px;">
+                <li>
+                    <strong>Швидка замітка:</strong> POST на <code>/api/shortcuts/note</code><br>
+                    Тіло: <code>{"date":"РРРР-ММ-ДД", "text":"Ваш текст"}</code>
+                </li>
+                <li>
+                    <strong>Оновлення ваги:</strong> POST на <code>/api/shortcuts/weight</code><br>
+                    Тіло: <code>{"weight": 76.2}</code>
+                </li>
+                <li>
+                    <strong>Швидкий протеїн/їжа:</strong> POST на <code>/api/shortcuts/meal</code><br>
+                    Тіло: <code>{"name":"Протеїн", "protein":30, "calories":120}</code>
+                </li>
+                <li>
+                    <strong>Виконати звичку (Duolingo/М'юїнг):</strong> POST на <code>/api/shortcuts/toggle</code><br>
+                    Тіло: <code>{"habitId":"duolingo", "done":true}</code>
+                </li>
+            </ul>
+        </div>
+
+        <button class="btn-primary" onclick="closeShortcutInstructions()">Зрозуміло</button>
+    </div>
+</div>
+
+<!-- Event Planner Modal -->
+<div id="event-modal" class="modal-overlay" style="display:none;">
+    <div class="card" style="margin:auto; max-width:380px; width:calc(100% - 32px); overflow-y:auto; max-height:85vh; padding: 20px 16px;">
+        <h3 style="font-size:18px; font-weight:700; margin-bottom:4px;" id="event-modal-title">Плани та події на день</h3>
+        <p id="event-modal-date-label" style="font-size:13px; color:var(--text-tertiary); margin-bottom:16px;"></p>
+        
+        <div id="event-modal-list" style="margin-bottom:16px;">
+            <!-- Render list of events and tasks for the selected day -->
+        </div>
+
+        <div style="border-top:1px solid var(--border); padding-top:12px;">
+            <label class="section-label" style="display:block; margin-bottom:8px;">Додати подію до розкладу</label>
+            <div style="display:flex; gap:8px; margin-bottom:8px;">
+                <input id="event-time-input" type="time" class="input-field" style="width:90px; padding:10px;">
+                <input id="event-text-input" type="text" class="input-field" placeholder="Наприклад: Стоматолог" style="flex:1; padding:10px;">
+            </div>
+            <div style="margin-bottom:12px;">
+                <select id="event-type-input" class="input-field" style="padding:10px; font-size:14px; height:auto;">
+                    <option value="other">🔵 Інша подія (Синя крапка)</option>
+                    <option value="gym">🏋️ Тренування / Зал (Червона крапка)</option>
+                </select>
+            </div>
+            <button class="btn-primary" onclick="addEvent()">+ Додати подію</button>
+        </div>
+        
+        <button class="btn-outline" style="margin-top:12px; padding:10px;" onclick="closeEventModal()">Закрити</button>
+    </div>
+</div>
+
+<script>
+/* ═══════ GLOBAL STATE ═══════ */
+let userToken = 'single_user_token';
+let userName = 'aura_user';
+let currentView = 'dashboard';
+let currentQuote = null;
+let selectedEventDate = null; // YYYY-MM-DD
+
+let S = {
+    profile: { weight: 75, goal: 'bulk', activity: 'medium' },
+    wakeup: {},
+    meals: [],
+    sprints: {},
+    completedToday: {},
+    events: {}, // YYYY-MM-DD -> [{id, time, text}]
+    lastOpenedDate: null
+};
+
+const SPRINT_TASKS = [
+    { id: 'ukrainian_1', name: 'Українська (Урок 1)', emoji: '🇺🇦', duration: 30 },
+    { id: 'ukrainian_2', name: 'Українська (Урок 2)', emoji: '🇺🇦', duration: 30 },
+    { id: 'english_1', name: 'Англійська (Урок 1)', emoji: '🇬🇧', duration: 30 },
+    { id: 'english_2', name: 'Англійська (Урок 2)', emoji: '🇬🇧', duration: 30 },
+    { id: 'history_1', name: 'Історія України (Урок 1)', emoji: '📚', duration: 30 },
+    { id: 'history_2', name: 'Історія України (Урок 2)', emoji: '📚', duration: 30 },
+    { id: 'guitar_1', name: 'Гітара (Сесія 1)', emoji: '🎸', duration: 60 },
+    { id: 'guitar_2', name: 'Гітара (Сесія 2)', emoji: '🎸', duration: 60 }
+];
+
+let sprintState = {
+    active: false, taskId: null, startTime: null,
+    timer: null, unfocusedSince: null, failed: false
+};
+
+/* ═══════ CORE HELPERS ═══════ */
+function getTodayString() {
+    return new Date().toISOString().split('T')[0];
+}
+
+function initSprintsForDate(dateStr) {
+    if (!S.sprints) S.sprints = {};
+    if (!S.sprints[dateStr]) S.sprints[dateStr] = {};
+    SPRINT_TASKS.forEach(t => {
+        if (!S.sprints[dateStr][t.id]) {
+            S.sprints[dateStr][t.id] = { completed: false, duration: 0 };
+        }
+    });
+}
+
+let toastTimer = null;
+function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast ' + type;
+    requestAnimationFrame(() => { t.classList.add('show'); });
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { t.classList.remove('show'); }, 3000);
+}
+
+async function apiCall(url, options = {}) {
+    const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+    if (userToken) headers['x-token'] = userToken;
+    const res = await fetch(url, { ...options, headers });
+    const data = await res.json();
+    if (!res.ok && data.error) throw new Error(data.error);
+    return data;
+}
+
+function updateSyncDot(status) {
+    const dot = document.getElementById('sync-dot');
+    if (!dot) return;
+    dot.style.background = status === 'ok' ? 'var(--accent)' : status === 'saving' ? 'var(--warning)' : 'var(--danger)';
+}
+
+/* ═══════ INIT ═══════ */
+async function initApp() {
+    document.getElementById('app').style.display = '';
+    await loadState();
+    loadProfile();
+    renderDailyTasks();
+    renderHeatmap();
+    renderMeals();
+    renderSprintTasks();
+    renderSprintHistory();
+    updateWakeupCard();
+    renderUpcomingEvents();
+}
+
+/* ═══════ NAVIGATION ═══════ */
+function switchView(viewName) {
+    currentView = viewName;
+    document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
+    const target = document.getElementById('view-' + viewName);
+    if (target) {
+        target.style.display = '';
+        target.style.animation = 'none';
+        target.offsetHeight;
+        target.style.animation = '';
+    }
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const navBtn = document.getElementById('nav-' + viewName);
+    if (navBtn) navBtn.classList.add('active');
+    
+    if (viewName === 'dashboard') {
+        renderDailyTasks();
+        renderHeatmap();
+        updateWakeupCard();
+        renderUpcomingEvents();
+    }
+    if (viewName === 'nutrition') renderMeals();
+    if (viewName === 'sprint') {
+        renderSprintTasks();
+        renderSprintHistory();
+    }
+}
+
+/* ═══════ STATE MANAGEMENT ═══════ */
+async function loadState() {
+    updateSyncDot('saving');
+    const stored = localStorage.getItem('aura_state');
+    if (stored) {
+        try { S = { ...S, ...JSON.parse(stored) }; } catch(e) {}
+    }
+    try {
+        const res = await apiCall('/api/state/aura_user');
+        if (res.ok && res.data) {
+            if (res.data._saved && (!S._saved || res.data._saved > S._saved)) {
+                S = { ...S, ...res.data };
+                localStorage.setItem('aura_state', JSON.stringify(S));
+            }
+        }
+        if (res.completed) {
+            S.completedToday = { ...S.completedToday, ...res.completed };
+        }
+    } catch(e) { console.warn('Offline mode — using local storage only.'); }
+    
+    // Defaults
+    S.profile = S.profile || { weight: 75, goal: 'bulk', activity: 'medium' };
+    S.wakeup = S.wakeup || {};
+    S.habits = S.habits || {};
+    S.sprints = S.sprints || {};
+    S.events = S.events || {};
+    S.completedToday = S.completedToday || {};
+    
+    // Group meals by date migration helper
+    const today = getTodayString();
+    if (!S.meals) {
+        S.meals = {};
+    } else if (Array.isArray(S.meals)) {
+        const oldMeals = S.meals;
+        S.meals = {};
+        oldMeals.forEach(m => {
+            const d = m.date || today;
+            if (!S.meals[d]) S.meals[d] = [];
+            S.meals[d].push(m);
+        });
+    }
+    
+    // Ensure today's keys exist
+    if (!S.habits[today]) {
+        S.habits[today] = { mewing_morning: false, mewing_evening: false, duolingo: false, wash_teeth: false, vacuum: [0, 0, 0, 0, 0] };
+    }
+    initSprintsForDate(today);
+    if (!S.meals[today]) {
+        S.meals[today] = [];
+    }
+    
+    checkRollover();
+    updateSyncDot('ok');
+}
+
+async function saveState() {
+    updateSyncDot('saving');
+    S._saved = new Date().toISOString();
+    localStorage.setItem('aura_state', JSON.stringify(S));
+    try {
+        await apiCall('/api/state/aura_user', {
+            method: 'POST',
+            body: JSON.stringify({ state: S, completed: S.completedToday })
+        });
+        updateSyncDot('ok');
+    } catch(e) { updateSyncDot('err'); }
+}
+
+function checkRollover() {
+    const today = getTodayString();
+    if (!S.lastOpenedDate) { S.lastOpenedDate = today; return; }
+    if (S.lastOpenedDate !== today) {
+        S.lastOpenedDate = today;
+        // Make sure today's keys exist
+        if (!S.habits[today]) {
+            S.habits[today] = { mewing_morning: false, mewing_evening: false, duolingo: false, wash_teeth: false, vacuum: [0, 0, 0, 0, 0] };
+        }
+        initSprintsForDate(today);
+        if (!S.meals[today]) {
+            S.meals[today] = [];
+        }
+        saveState();
+    }
+}
+
+function resetAllData() {
+    if (confirm('Ви впевнені, що хочете очистити ВСІ дані додатку? Цю дію неможливо скасувати.')) {
+        localStorage.removeItem('aura_state');
+        showToast('Дані очищено', 'error');
+        window.location.reload();
+    }
+}
+
+/* ═══════ WAKE-UP PROTOCOL ═══════ */
+async function openWakeupChallenge() {
+    const overlay = document.getElementById('wakeup-overlay');
+    overlay.style.display = '';
+    document.getElementById('wakeup-typed-quote').value = '';
+    document.getElementById('wakeup-reflection').value = '';
+    document.getElementById('wakeup-char-counter').textContent = '0 символів';
+    document.getElementById('wakeup-reflection-counter').textContent = '0 символів';
+    document.getElementById('wakeup-status').style.display = 'none';
+    document.getElementById('wakeup-submit-btn').disabled = false;
+    document.getElementById('wakeup-submit-btn').textContent = '🔓 ПІДТВЕРДИТИ ПРОБУДЖЕННЯ';
+
+    const today = getTodayString();
+    if (S.wakeup[today] && S.wakeup[today].isAwake) {
+        document.getElementById('wakeup-quote-text').textContent = S.wakeup[today].quote || 'Ви вже підтвердили пробудження!';
+        document.getElementById('wakeup-quote-author').textContent = S.wakeup[today].author || '';
+        const statusEl = document.getElementById('wakeup-status');
+        statusEl.style.display = '';
+        statusEl.className = 'wakeup-status success';
+        statusEl.textContent = '✅ Пробудження вже підтверджено сьогодні!';
+        document.getElementById('wakeup-submit-btn').style.display = 'none';
+        return;
+    }
+    document.getElementById('wakeup-submit-btn').style.display = '';
+
+    try {
+        const data = await apiCall('/api/wakeup/quote?user=aura_user');
+        if (data.ok) {
+            currentQuote = { quote: data.quote, author: data.author };
+            document.getElementById('wakeup-quote-text').textContent = '«' + data.quote + '»';
+            document.getElementById('wakeup-quote-author').textContent = '— ' + data.author;
+        }
+    } catch(e) {
+        currentQuote = { quote: 'Перешкода на шляху стає шляхом.', author: 'Марк Аврелій' };
+        document.getElementById('wakeup-quote-text').textContent = '«' + currentQuote.quote + '»';
+        document.getElementById('wakeup-quote-author').textContent = '— ' + currentQuote.author;
+    }
+}
+
+function closeWakeup() {
+    document.getElementById('wakeup-overlay').style.display = 'none';
+}
+
+async function submitWakeup() {
+    if (!currentQuote) return showToast('Цитата не завантажена', 'error');
+    const typedQuote = document.getElementById('wakeup-typed-quote').value.trim();
+    const reflection = document.getElementById('wakeup-reflection').value.trim();
+
+    if (!typedQuote) return showToast('Передрукуйте цитату', 'error');
+    if (!reflection) return showToast('Напишіть рефлексію', 'error');
+
+    const sentenceEnders = (reflection.match(/[.!?…]+/g) || []).length;
+    if (sentenceEnders < 2 || reflection.length < 40) {
+        return showToast('Потрібно мінімум 2 повних речення', 'error');
+    }
+
+    const btn = document.getElementById('wakeup-submit-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> AI перевіряє...';
+
+    const statusEl = document.getElementById('wakeup-status');
+    statusEl.style.display = '';
+    statusEl.className = 'wakeup-status loading';
+    statusEl.textContent = '⏳ AI аналізує вашу рефлексію...';
+
+    try {
+        const data = await apiCall('/api/wakeup/verify', {
+            method: 'POST',
+            body: JSON.stringify({
+                typedQuote,
+                reflection,
+                originalQuote: currentQuote.quote
+            })
+        });
+
+        if (data.ok && data.isAwake) {
+            S.wakeup[getTodayString()] = {
+                isAwake: true,
+                quote: currentQuote.quote,
+                author: currentQuote.author,
+                verifiedAt: new Date().toISOString()
+            };
+            if (!S.completedToday[getTodayString()]) S.completedToday[getTodayString()] = [];
+            if (!S.completedToday[getTodayString()].includes('wakeup')) {
+                S.completedToday[getTodayString()].push('wakeup');
+            }
+            await saveState();
+            statusEl.className = 'wakeup-status success';
+            statusEl.textContent = '✅ ' + (data.aiValidation?.reason || 'Пробудження підтверджено!');
+            showToast('🔥 Пробудження підтверджено! Вперед до перемоги!');
+            updateWakeupCard();
+            renderDailyTasks();
+            renderHeatmap();
+            setTimeout(() => closeWakeup(), 2000);
+        } else {
+            statusEl.className = 'wakeup-status error';
+            statusEl.textContent = '❌ ' + (data.error || data.aiValidation?.reason || 'Спробуйте ще раз');
+            btn.disabled = false;
+            btn.textContent = '🔓 ПІДТВЕРДИТИ ПРОБУДЖЕННЯ';
+        }
+    } catch(e) {
+        statusEl.className = 'wakeup-status error';
+        statusEl.textContent = '❌ ' + e.message;
+        btn.disabled = false;
+        btn.textContent = '🔓 ПІДТВЕРДИТИ ПРОБУДЖЕННЯ';
+    }
+}
+
+function updateWakeupCard() {
+    const today = getTodayString();
+    const el = document.getElementById('wakeup-status-text');
+    const btn = document.querySelector('#wakeup-card .btn-outline');
+    if (S.wakeup[today] && S.wakeup[today].isAwake) {
+        el.textContent = '✅ Підтверджено';
+        el.style.color = 'var(--accent)';
+        if (btn) { btn.textContent = '✓ Виконано'; btn.style.borderColor = 'var(--accent)'; btn.style.color = 'var(--accent)'; }
+    } else {
+        el.textContent = '⏳ Не підтверджено';
+        el.style.color = '';
+        if (btn) { btn.textContent = 'Пройти'; btn.style.borderColor = ''; btn.style.color = ''; }
+    }
+}
+
+/* ═══════ ADVANCED HEATMAP & EVENTS CALENDAR ═══════ */
+function renderHeatmap() {
+    const grid = document.getElementById('heatmap-grid');
+    const monthsEl = document.getElementById('heatmap-months');
+    const streakEl = document.getElementById('dashboard-streak-text');
+    if (!grid) return;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayStr = getTodayString();
+    const numWeeks = 15;
+    const totalDays = numWeeks * 7;
+
+    const dayOfWeek = today.getDay();
+    const mondayOffset = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    const currentMonday = new Date(today);
+    currentMonday.setDate(today.getDate() - mondayOffset);
+
+    const startDate = new Date(currentMonday);
+    startDate.setDate(startDate.getDate() - (numWeeks - 1) * 7);
+
+    let html = '';
+    const TOTAL_TASKS = 14; // wakeup + 4 habits + vacuum + 8 sprints
+
+    for (let d = 0; d < totalDays; d++) {
+        const cellDate = new Date(startDate);
+        cellDate.setDate(startDate.getDate() + d);
+        const dateStr = cellDate.toISOString().split('T')[0];
+        const isFuture = cellDate > today;
+        const isToday = dateStr === todayStr;
+
+        let level = 0;
+        let hasGym = false;
+        let hasOther = false;
+        let hasVacuum = false;
+
+        if (!isFuture) {
+            const completed = S.completedToday[dateStr];
+            if (completed && Array.isArray(completed)) {
+                const pct = completed.length / TOTAL_TASKS;
+                if (pct > 0.75) level = 4;
+                else if (pct > 0.5) level = 3;
+                else if (pct > 0.25) level = 2;
+                else if (pct > 0) level = 1;
+            }
+            
+            // Check if vacuum set is recorded
+            const h = S.habits && S.habits[dateStr];
+            if (h && h.vacuum && h.vacuum.some(v => v > 0)) {
+                hasVacuum = true;
+            }
+        }
+
+        // Check planned events (even future ones)
+        const evs = S.events && S.events[dateStr];
+        if (evs && Array.isArray(evs)) {
+            hasGym = evs.some(e => e.type === 'gym');
+            hasOther = evs.some(e => e.type === 'other');
+        }
+
+        const dayNum = cellDate.getDay();
+        const isGymDay = [1, 3, 5, 6, 0].includes(dayNum);
+        
+        const classes = ['heatmap-cell'];
+        if (isFuture) classes.push('future');
+        else classes.push('level-' + level);
+        if (isToday) classes.push('today');
+        if (isGymDay) classes.push('gym-day');
+
+        // Allow clicking any cell regardless of future/past
+        const clickAttr = `onclick="openEventPlanner('${dateStr}')"`;
+
+        const dayLabels = ['Нд', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+        const dayLabel = dayLabels[dayNum];
+
+        let dotsHtml = '';
+        if (hasGym || hasOther || hasVacuum) {
+            dotsHtml = '<div class="heatmap-dot-container">';
+            if (hasGym) dotsHtml += '<span class="heatmap-dot gym" title="Тренування у залі"></span>';
+            if (hasOther) dotsHtml += '<span class="heatmap-dot other" title="Запланована подія"></span>';
+            if (hasVacuum) dotsHtml += '<span class="heatmap-dot vacuum" title="Вакуум живота"></span>';
+            dotsHtml += '</div>';
+        }
+
+        html += `
+            <div class="${classes.join(' ')}" ${clickAttr} title="${dateStr}" style="flex-direction:column; padding-top: 1px;">
+                <span style="font-size: 7px; font-weight: 900; opacity: 0.85; pointer-events: none; line-height: 1;">${dayLabel}</span>
+                ${dotsHtml}
+            </div>`;
+    }
+
+    grid.style.gridTemplateColumns = `repeat(${numWeeks}, 1fr)`;
+    grid.style.gridTemplateRows = 'repeat(7, 1fr)';
+    grid.style.gridAutoFlow = 'column';
+    grid.innerHTML = html;
+
+    // Calculate Streak
+    let streak = 0;
+    for (let d = 1; d <= 365; d++) {
+        const checkDate = new Date(today);
+        checkDate.setDate(today.getDate() - d);
+        const dateStr = checkDate.toISOString().split('T')[0];
+        const completed = S.completedToday[dateStr];
+        if (completed && Array.isArray(completed) && completed.length > 0) {
+            streak++;
+        } else {
+            break;
+        }
+    }
+    const todayCompleted = S.completedToday[todayStr];
+    if (todayCompleted && Array.isArray(todayCompleted) && todayCompleted.length > 0) {
+        streak++;
+    }
+    streakEl.textContent = '🔥 ' + streak + ' ' + (streak === 1 ? 'день' : streak < 5 ? 'дні' : 'днів');
+
+    // Months row rendering
+    const months = ['Січ', 'Лют', 'Бер', 'Кві', 'Тра', 'Чер', 'Лип', 'Сер', 'Вер', 'Жов', 'Лис', 'Гру'];
+    let monthHtml = '';
+    let lastMonth = -1;
+    for (let w = 0; w < numWeeks; w++) {
+        const weekStart = new Date(startDate);
+        weekStart.setDate(startDate.getDate() + w * 7);
+        const m = weekStart.getMonth();
+        if (m !== lastMonth) {
+            monthHtml += `<span style="flex:1; font-size:10px; color:var(--text-tertiary);">${months[m]}</span>`;
+            lastMonth = m;
+        } else {
+            monthHtml += '<span style="flex:1;"></span>';
+        }
+    }
+    monthsEl.innerHTML = monthHtml;
+}
+
+/* ═══════ EVENT PLANNER LOGIC ═══════ */
+function openEventPlanner(dateStr) {
+    selectedEventDate = dateStr;
+    const modal = document.getElementById('event-modal');
+    modal.style.display = '';
+    
+    // Formatting title label
+    const dateObj = new Date(dateStr);
+    const options = { weekday: 'long', day: 'numeric', month: 'long' };
+    document.getElementById('event-modal-date-label').textContent = dateObj.toLocaleDateString('uk-UA', options);
+    
+    document.getElementById('event-time-input').value = '';
+    document.getElementById('event-text-input').value = '';
+    
+    renderEventModalList();
+}
+
+function closeEventModal() {
+    document.getElementById('event-modal').style.display = 'none';
+}
+
+function renderEventModalList() {
+    const listEl = document.getElementById('event-modal-list');
+    if (!listEl) return;
+    listEl.innerHTML = '';
+
+    const d = selectedEventDate;
+    
+    // Ensure structures exist
+    if (!S.habits) S.habits = {};
+    if (!S.habits[d]) {
+        S.habits[d] = { mewing_morning: false, mewing_evening: false, duolingo: false, wash_teeth: false, vacuum: [0, 0, 0, 0, 0] };
+    }
+    initSprintsForDate(d);
+    if (!S.completedToday) S.completedToday = {};
+    if (!S.completedToday[d]) S.completedToday[d] = [];
+
+    const habits = S.habits[d];
+    const sprints = S.sprints[d];
+    const isAwake = S.wakeup[d] && S.wakeup[d].isAwake;
+    
+    // Gym Day check
+    const dateObj = new Date(d);
+    const dayOfWeek = dateObj.getDay(); // 0 = Sunday, 1 = Monday ...
+    const isGymDay = [1, 3, 5, 6, 0].includes(dayOfWeek);
+
+    let html = '';
+
+    // 1. РАНОК (після 9:00)
+    html += `
+        <div style="margin-bottom: 16px;">
+            <div class="section-label" style="color: var(--accent); margin-bottom: 6px;">🌅 Ранок (після 09:00)</div>
+            <div class="daily-task-item" style="padding: 10px 0;" onclick="openWakeupForDate('${d}')">
+                <div class="daily-task-check ${isAwake ? 'done' : ''}">${isAwake ? '✓' : ''}</div>
+                <span class="daily-task-name ${isAwake ? 'done' : ''}">⏰ Пробудження та рефлексія</span>
+            </div>
+            <div class="daily-task-item" style="padding: 10px 0;" onclick="toggleHabitForDate('${d}', 'wash_teeth')">
+                <div class="daily-task-check ${habits.wash_teeth ? 'done' : ''}">${habits.wash_teeth ? '✓' : ''}</div>
+                <span class="daily-task-name ${habits.wash_teeth ? 'done' : ''}">🧼 Вмитися та почистити зуби</span>
+            </div>
+            <div class="daily-task-item" style="padding: 10px 0;" onclick="toggleHabitForDate('${d}', 'mewing_morning')">
+                <div class="daily-task-check ${habits.mewing_morning ? 'done' : ''}">${habits.mewing_morning ? '✓' : ''}</div>
+                <span class="daily-task-name ${habits.mewing_morning ? 'done' : ''}">👅 М'юїнг (Ранок)</span>
+            </div>
+            <div class="daily-task-item" style="padding: 10px 0;" onclick="toggleHabitForDate('${d}', 'duolingo')">
+                <div class="daily-task-check ${habits.duolingo ? 'done' : ''}">${habits.duolingo ? '✓' : ''}</div>
+                <span class="daily-task-name ${habits.duolingo ? 'done' : ''}">🦉 Duolingo</span>
+            </div>
+        </div>
+    `;
+
+    // 2. ВЕЧІР
+    html += `
+        <div style="margin-bottom: 16px;">
+            <div class="section-label" style="color: var(--purple); margin-bottom: 6px;">🌙 Вечір</div>
+            <div class="daily-task-item" style="padding: 10px 0;" onclick="toggleHabitForDate('${d}', 'mewing_evening')">
+                <div class="daily-task-check ${habits.mewing_evening ? 'done' : ''}">${habits.mewing_evening ? '✓' : ''}</div>
+                <span class="daily-task-name ${habits.mewing_evening ? 'done' : ''}">👅 М'юїнг (Вечір)</span>
+            </div>
+        </div>
+    `;
+
+    // 3. ФОКУС-СПРИНТИ
+    html += `
+        <div style="margin-bottom: 16px;">
+            <div class="section-label" style="color: var(--info); margin-bottom: 6px;">⏱️ Спринти та вільний час</div>
+            ${SPRINT_TASKS.map(t => {
+                const completed = sprints[t.id] && sprints[t.id].completed;
+                return `
+                    <div class="daily-task-item" style="padding: 10px 0;" onclick="toggleSprintForDate('${d}', '${t.id}')">
+                        <div class="daily-task-check ${completed ? 'done' : ''}">${completed ? '✓' : ''}</div>
+                        <span class="daily-task-name ${completed ? 'done' : ''}">${t.emoji} ${t.name} (${t.duration} хв)</span>
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
+
+    // 4. ЗАПЛАНОВАНІ ПОДІЇ
+    html += `
+        <div style="margin-bottom: 12px;">
+            <div class="section-label" style="color: var(--warning); margin-bottom: 6px;">📅 Розклад та Події</div>
+    `;
+    
+    const events = [...(S.events[d] || [])];
+    if (isGymDay) {
+        events.push({
+            id: 'gym_auto_event',
+            time: '18:00',
+            text: 'Тренування у залі',
+            type: 'gym',
+            isAuto: true
+        });
+    }
+
+    if (events.length === 0) {
+        html += '<p style="color:var(--text-tertiary); font-size:13px; padding:6px 0;">Вільний день (немає подій)</p>';
+    } else {
+        events.sort((a, b) => a.time.localeCompare(b.time));
+        events.forEach(ev => {
+            const delBtn = ev.isAuto ? '' : `<button class="event-del-btn" onclick="deleteEvent('${ev.id}')">×</button>`;
+            html += `
+                <div class="event-item" style="margin-top:6px;">
+                    <span class="event-time" style="color: ${ev.type === 'gym' ? 'var(--danger)' : 'var(--info)'}; min-width: 45px; display:inline-block;">${ev.time}</span>
+                    <span class="event-text" style="font-weight: 500;">${ev.type === 'gym' ? '🏋️ ' : '🔵 '}${ev.text}</span>
+                    ${delBtn}
+                </div>
+            `;
+        });
+    }
+    html += `</div>`;
+
+    listEl.innerHTML = html;
+}
+
+function addEvent() {
+    const timeVal = document.getElementById('event-time-input').value;
+    const textVal = document.getElementById('event-text-input').value.trim();
+    const typeVal = document.getElementById('event-type-input') ? document.getElementById('event-type-input').value : 'other';
+    
+    if (!timeVal || !textVal) {
+        return showToast('Введіть час та назву події', 'error');
+    }
+    
+    if (!S.events[selectedEventDate]) {
+        S.events[selectedEventDate] = [];
+    }
+    
+    S.events[selectedEventDate].push({
+        id: Date.now().toString(),
+        time: timeVal,
+        text: textVal,
+        type: typeVal
+    });
+    
+    saveState();
+    renderEventModalList();
+    renderUpcomingEvents();
+    renderHeatmap();
+    showToast('Подію додано!');
+}
+
+function deleteEvent(eventId) {
+    if (!S.events[selectedEventDate]) return;
+    
+    S.events[selectedEventDate] = S.events[selectedEventDate].filter(ev => ev.id !== eventId);
+    if (S.events[selectedEventDate].length === 0) {
+        delete S.events[selectedEventDate];
+    }
+    
+    saveState();
+    renderEventModalList();
+    renderUpcomingEvents();
+    renderHeatmap();
+    showToast('Подію видалено', 'error');
+}
+
+function toggleHabitForDate(dateStr, habitId) {
+    if (!S.habits[dateStr]) {
+        S.habits[dateStr] = { mewing_morning: false, mewing_evening: false, duolingo: false, vacuum: [0, 0, 0, 0, 0] };
+    }
+    S.habits[dateStr][habitId] = !S.habits[dateStr][habitId];
+
+    if (!S.completedToday) S.completedToday = {};
+    if (!S.completedToday[dateStr]) S.completedToday[dateStr] = [];
+
+    if (S.habits[dateStr][habitId]) {
+        if (!S.completedToday[dateStr].includes(habitId)) S.completedToday[dateStr].push(habitId);
+    } else {
+        S.completedToday[dateStr] = S.completedToday[dateStr].filter(id => id !== habitId);
+    }
+
+    saveState();
+    renderEventModalList();
+    renderDailyTasks();
+    renderHeatmap();
+}
+
+function toggleSprintForDate(dateStr, taskId) {
+    initSprintsForDate(dateStr);
+    
+    const comp = !S.sprints[dateStr][taskId].completed;
+    S.sprints[dateStr][taskId].completed = comp;
+    if (comp) {
+        S.sprints[dateStr][taskId].completedAt = new Date().toISOString();
+        if (!S.completedToday[dateStr].includes(taskId)) S.completedToday[dateStr].push(taskId);
+    } else {
+        delete S.sprints[dateStr][taskId].completedAt;
+        S.completedToday[dateStr] = S.completedToday[dateStr].filter(id => id !== taskId);
+    }
+
+    saveState();
+    renderEventModalList();
+    renderDailyTasks();
+    renderHeatmap();
+}
+
+function openWakeupForDate(dateStr) {
+    const today = getTodayString();
+    if (dateStr !== today) {
+        showToast('Пробудження можна проходити тільки на сьогодні!', 'error');
+        return;
+    }
+    closeEventModal();
+    openWakeupChallenge();
+}
+
+function renderUpcomingEvents() {
+    const container = document.getElementById('dashboard-upcoming-events');
+    container.innerHTML = '';
+    
+    const todayStr = getTodayString();
+    
+    // Calculate tomorrow
+    const tomDate = new Date();
+    tomDate.setDate(tomDate.getDate() + 1);
+    const tomStr = tomDate.toISOString().split('T')[0];
+    
+    const todayEvents = [...(S.events[todayStr] || [])].map(e => ({ ...e, day: 'Сьогодні' }));
+    const tomEvents = [...(S.events[tomStr] || [])].map(e => ({ ...e, day: 'Завтра' }));
+    
+    // Gym Day check for today (Monday, Wednesday, Friday, Saturday, Sunday)
+    const tDayNum = new Date(todayStr).getDay();
+    if ([1, 3, 5, 6, 0].includes(tDayNum)) {
+        todayEvents.push({ id: 'gym_auto_today', time: '18:00', text: 'Тренування у залі', day: 'Сьогодні', type: 'gym' });
+    }
+    // Gym Day check for tomorrow
+    const tomDayNum = tomDate.getDay();
+    if ([1, 3, 5, 6, 0].includes(tomDayNum)) {
+        tomEvents.push({ id: 'gym_auto_tom', time: '18:00', text: 'Тренування у залі', day: 'Завтра', type: 'gym' });
+    }
+    
+    // Sort day events by time
+    todayEvents.sort((a,b) => a.time.localeCompare(b.time));
+    tomEvents.sort((a,b) => a.time.localeCompare(b.time));
+    
+    const combined = [...todayEvents, ...tomEvents];
+    
+    if (combined.length === 0) {
+        container.innerHTML = '<p style="color:var(--text-tertiary); font-size:13px; text-align:center; padding:10px 0;">Немає запланованих подій на сьогодні та завтра</p>';
+        return;
+    }
+    
+    combined.forEach(ev => {
+        const div = document.createElement('div');
+        div.className = 'event-block';
+        div.innerHTML = `
+            <span style="font-size:12px; font-weight:700; color: ${ev.day === 'Сьогодні' ? 'var(--accent)' : 'var(--warning)'}; min-width: 65px;">
+                ${ev.day}
+            </span>
+            <span class="event-time" style="margin-right: 10px; color: ${ev.type === 'gym' ? 'var(--danger)' : 'var(--info)'}">${ev.time}</span>
+            <span style="font-size:14px; color:var(--text-secondary); flex:1; font-weight: 500;">${ev.type === 'gym' ? '🏋️ ' : '🔵 '}${ev.text}</span>
+        `;
+        container.appendChild(div);
+    });
+}
+
+/* ═══════ DAILY TASKS ═══════ */
+function renderDailyTasks() {
+    const el = document.getElementById('daily-tasks-list');
+    if (!el) return;
+    const today = getTodayString();
+    
+    // Ensure structures exist
+    if (!S.habits) S.habits = {};
+    if (!S.habits[today]) {
+        S.habits[today] = { mewing_morning: false, mewing_evening: false, duolingo: false, wash_teeth: false, vacuum: [0, 0, 0, 0, 0] };
+    }
+    initSprintsForDate(today);
+    if (!S.completedToday) S.completedToday = {};
+    if (!S.completedToday[today]) S.completedToday[today] = [];
+
+    const habitsToday = S.habits[today];
+    const sprintsToday = S.sprints[today];
+
+    const allTasks = [
+        { id: 'wakeup', name: '⏰ Пробудження', done: S.completedToday[today].includes('wakeup'), action: 'openWakeupChallenge()' },
+        { id: 'wash_teeth', name: '🧼 Вмитися та почистити зуби', done: !!habitsToday.wash_teeth, action: 'toggleHabit(\'wash_teeth\')' },
+        { id: 'mewing_morning', name: '👅 М\'юїнг (Ранок)', done: !!habitsToday.mewing_morning, action: 'toggleHabit(\'mewing_morning\')' },
+        { id: 'mewing_evening', name: '👅 М\'юїнг (Вечір)', done: !!habitsToday.mewing_evening, action: 'toggleHabit(\'mewing_evening\')' },
+        { id: 'duolingo', name: '🦉 Duolingo', done: !!habitsToday.duolingo, action: 'toggleHabit(\'duolingo\')' },
+        ...SPRINT_TASKS.map(t => ({
+            id: t.id,
+            name: `${t.emoji} ${t.name} (${t.duration} хв)`,
+            done: !!(sprintsToday[t.id] && sprintsToday[t.id].completed),
+            action: `switchView('sprint'); if (!S.sprints['${today}']['${t.id}'].completed) startSprint('${t.id}');`
+        }))
+    ];
+
+    let html = '';
+    allTasks.forEach(task => {
+        html += `
+            <div class="daily-task-item" onclick="${task.action}">
+                <div class="daily-task-check ${task.done ? 'done' : ''}">${task.done ? '✓' : ''}</div>
+                <span class="daily-task-name ${task.done ? 'done' : ''}">${task.name}</span>
+            </div>`;
+    });
+    el.innerHTML = html;
+    
+    // Load vacuum input values
+    loadVacuumInputs();
+}
+
+function toggleHabit(habitId) {
+    const today = getTodayString();
+    if (!S.habits) S.habits = {};
+    if (!S.habits[today]) {
+        S.habits[today] = { mewing_morning: false, mewing_evening: false, duolingo: false, vacuum: [0, 0, 0, 0, 0] };
+    }
+    S.habits[today][habitId] = !S.habits[today][habitId];
+    
+    if (!S.completedToday) S.completedToday = {};
+    if (!S.completedToday[today]) S.completedToday[today] = [];
+    
+    if (S.habits[today][habitId]) {
+        if (!S.completedToday[today].includes(habitId)) {
+            S.completedToday[today].push(habitId);
+        }
+    } else {
+        S.completedToday[today] = S.completedToday[today].filter(id => id !== habitId);
+    }
+    
+    saveState();
+    renderDailyTasks();
+    renderHeatmap();
+    showToast('Статус звички оновлено!');
+}
+
+function saveVacuumSet(setIdx, value) {
+    const today = getTodayString();
+    if (!S.habits) S.habits = {};
+    if (!S.habits[today]) {
+        S.habits[today] = { mewing_morning: false, mewing_evening: false, duolingo: false, vacuum: [0, 0, 0, 0, 0] };
+    }
+    const val = parseInt(value) || 0;
+    S.habits[today].vacuum[setIdx] = val;
+    
+    // Count vacuum as done in completedToday if all 5 sets are completed (> 0)
+    const allDone = S.habits[today].vacuum.every(v => v > 0);
+    if (!S.completedToday) S.completedToday = {};
+    if (!S.completedToday[today]) S.completedToday[today] = [];
+    
+    if (allDone) {
+        if (!S.completedToday[today].includes('vacuum')) {
+            S.completedToday[today].push('vacuum');
+        }
+    } else {
+        S.completedToday[today] = S.completedToday[today].filter(id => id !== 'vacuum');
+    }
+    
+    saveState();
+    renderHeatmap();
+}
+
+function loadVacuumInputs() {
+    const today = getTodayString();
+    const habitToday = S.habits && S.habits[today];
+    const vacuum = (habitToday && habitToday.vacuum) || [0, 0, 0, 0, 0];
+    for (let i = 0; i < 5; i++) {
+        const el = document.getElementById(`vacuum-input-${i}`);
+        if (el) {
+            el.value = vacuum[i] || '';
+        }
+    }
+}
+
+/* ═══════ NUTRITION ═══════ */
+async function generateRecipe() {
+    const ingredients = document.getElementById('recipe-ingredients').value.trim();
+    if (!ingredients) return showToast('Введіть продукти', 'error');
+
+    const btn = document.getElementById('recipe-gen-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> AI генерує...';
+
+    try {
+        const data = await apiCall('/api/nutrition/recipe', {
+            method: 'POST',
+            body: JSON.stringify({
+                ingredients,
+                weight: S.profile.weight,
+                goal: S.profile.goal,
+                activityLevel: S.profile.activity
+            })
+        });
+
+        if (data.ok && data.recipe) {
+            const r = data.recipe;
+            document.getElementById('recipe-name').textContent = r.name || 'Рецепт';
+
+            const macros = r.macros || {};
+            document.getElementById('recipe-macros').innerHTML = `
+                <div class="macro-item cal"><div class="macro-value">${macros.calories || 0}</div><div class="macro-label">Ккал</div></div>
+                <div class="macro-item protein"><div class="macro-value">${macros.protein || 0}г</div><div class="macro-label">Білок</div></div>
+                <div class="macro-item fat"><div class="macro-value">${macros.fat || 0}г</div><div class="macro-label">Жири</div></div>
+                <div class="macro-item carbs"><div class="macro-value">${macros.carbs || 0}г</div><div class="macro-label">Вугл.</div></div>
+            `;
+
+            const warningEl = document.getElementById('recipe-warning');
+            if (r.warning && r.warning !== 'null' && r.warning !== null) {
+                warningEl.innerHTML = `<div class="recipe-warning">⚠️ ${r.warning}</div>`;
+            } else {
+                warningEl.innerHTML = '';
+            }
+
+            const steps = r.steps || [];
+            let stepsHtml = '';
+            steps.forEach((step, i) => {
+                stepsHtml += `<div class="recipe-step"><div class="recipe-step-num">${i + 1}</div><div style="flex:1; font-size:14px; color:var(--text-secondary); line-height:1.5;">${step}</div></div>`;
+            });
+            document.getElementById('recipe-steps').innerHTML = stepsHtml;
+            document.getElementById('recipe-result').style.display = '';
+        }
+    } catch(e) {
+        showToast('Помилка генерації: ' + e.message, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '🧠 Згенерувати рецепт';
+    }
+}
+
+function addMealPrompt() {
+    document.getElementById('meal-modal').style.display = '';
+    document.getElementById('meal-name').value = '';
+    document.getElementById('meal-calories').value = '';
+    document.getElementById('meal-protein').value = '';
+    document.getElementById('meal-fat').value = '';
+    document.getElementById('meal-carbs').value = '';
+}
+
+function closeMealModal() {
+    document.getElementById('meal-modal').style.display = 'none';
+}
+
+function saveMeal() {
+    const name = document.getElementById('meal-name').value.trim();
+    const calories = parseInt(document.getElementById('meal-calories').value) || 0;
+    if (!name) return showToast("Введіть назву страви", 'error');
+
+    const today = getTodayString();
+    if (!S.meals) S.meals = {};
+    if (!S.meals[today]) S.meals[today] = [];
+
+    S.meals[today].push({
+        id: Date.now().toString(),
+        type: document.getElementById('meal-type').value,
+        name,
+        calories,
+        protein: parseInt(document.getElementById('meal-protein').value) || 0,
+        fat: parseInt(document.getElementById('meal-fat').value) || 0,
+        carbs: parseInt(document.getElementById('meal-carbs').value) || 0
+    });
+
+    saveState();
+    renderMeals();
+    closeMealModal();
+    showToast('Страву додано!');
+}
+
+function renderMeals() {
+    const el = document.getElementById('meals-list');
+    const totalEl = document.getElementById('total-calories');
+    if (!el) return;
+
+    const today = getTodayString();
+    if (!S.meals) S.meals = {};
+    const todayMeals = S.meals[today] || [];
+
+    if (todayMeals.length === 0) {
+        el.innerHTML = '<p style="color:var(--text-tertiary); font-size:14px;">Ще немає записів</p>';
+        totalEl.textContent = '0 kcal';
+        return;
+    }
+
+    const typeNames = { breakfast: '🌅 Сніданок', lunch: '☀️ Обід', dinner: '🌙 Вечеря', snack: '🍎 Перекус' };
+    let totalCal = 0;
+    let html = '';
+
+    todayMeals.forEach(m => {
+        totalCal += m.calories;
+        html += `
+            <div class="meal-item">
+                <div>
+                    <div style="font-weight:600; font-size:15px;">${m.name}</div>
+                    <span class="meal-type-badge">${typeNames[m.type] || m.type}</span>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-weight:700; color:var(--warning);">${m.calories} kcal</div>
+                    <div style="font-size:11px; color:var(--text-tertiary);">Б${m.protein}г Ж${m.fat}г В${m.carbs}г</div>
+                </div>
+            </div>`;
+    });
+
+    el.innerHTML = html;
+    totalEl.textContent = totalCal + ' kcal';
+}
+
+function renderSprintTasks() {
+    const grid = document.getElementById('sprint-tasks-grid');
+    if (!grid) return;
+    const today = getTodayString();
+    
+    initSprintsForDate(today);
+
+    let html = '';
+    SPRINT_TASKS.forEach(task => {
+        const done = !!(S.sprints[today][task.id] && S.sprints[today][task.id].completed);
+        html += `
+            <div class="sprint-task-card ${done ? 'completed' : ''}" onclick="${done ? '' : `startSprint('${task.id}')`}">
+                <span class="task-emoji">${task.emoji}</span>
+                <div class="task-name">${task.name}</div>
+                ${done ? '<div class="task-done">✓ Виконано</div>' : `<div style="font-size:11px; color:var(--text-tertiary); margin-top:4px;">${task.duration} хв</div>`}
+            </div>`;
+    });
+    grid.innerHTML = html;
+}
+
+function startSprint(taskId) {
+    const today = getTodayString();
+    
+    initSprintsForDate(today);
+    if (S.sprints[today][taskId] && S.sprints[today][taskId].completed) {
+        return showToast('Це завдання вже виконано!');
+    }
+
+    if (sprintState.active) return showToast('Спринт вже активний', 'error');
+
+    const task = SPRINT_TASKS.find(t => t.id === taskId);
+    if (!task) return;
+
+    sprintState = {
+        active: true, taskId, startTime: Date.now(),
+        timer: null, unfocusedSince: null, failed: false
+    };
+
+    document.getElementById('sprint-selector').style.display = 'none';
+    document.getElementById('sprint-active').style.display = '';
+    document.getElementById('sprint-task-name').textContent = task.emoji + ' ' + task.name;
+    document.getElementById('sprint-time').textContent = String(task.duration).padStart(2, '0') + ':00';
+    document.getElementById('sprint-ring').style.setProperty('--progress', '0');
+
+    const focusEl = document.getElementById('sprint-focus');
+    focusEl.className = 'sprint-focus-indicator focused';
+    document.getElementById('sprint-focus-text').textContent = 'У фокусі';
+
+    sprintState.timer = setInterval(tickSprint, 1000);
+    showToast('⏱️ Спринт розпочато! Не згортай додаток!');
+}
+
+function tickSprint() {
+    if (!sprintState.active) return;
+
+    const task = SPRINT_TASKS.find(t => t.id === sprintState.taskId);
+    if (!task) return;
+
+    const elapsed = (Date.now() - sprintState.startTime) / 1000;
+    const totalSeconds = task.duration * 60;
+    const remaining = Math.max(0, totalSeconds - elapsed);
+    const progress = Math.min(100, (elapsed / totalSeconds) * 100);
+
+    const mins = Math.floor(remaining / 60);
+    const secs = Math.floor(remaining % 60);
+    document.getElementById('sprint-time').textContent = String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+    document.getElementById('sprint-ring').style.setProperty('--progress', progress.toFixed(1));
+
+    if (remaining <= 0) {
+        completeSprint(sprintState.taskId);
+    }
+}
+
+function cancelSprint() {
+    if (sprintState.timer) clearInterval(sprintState.timer);
+    sprintState = { active: false, taskId: null, startTime: null, timer: null, unfocusedSince: null, failed: false };
+    document.getElementById('sprint-active').style.display = 'none';
+    document.getElementById('sprint-selector').style.display = '';
+    showToast('Спринт скасовано', 'error');
+}
+
+function failSprint() {
+    if (sprintState.timer) clearInterval(sprintState.timer);
+    const activeEl = document.getElementById('sprint-active');
+    activeEl.classList.add('sprint-failed');
+    setTimeout(() => activeEl.classList.remove('sprint-failed'), 500);
+
+    showToast('💀 СПРИНТ ЗІРВАНО! Ти згорнув додаток більше ніж на 15 секунд. Почни спочатку.', 'error');
+
+    sprintState = { active: false, taskId: null, startTime: null, timer: null, unfocusedSince: null, failed: false };
+    setTimeout(() => {
+        document.getElementById('sprint-active').style.display = 'none';
+        document.getElementById('sprint-selector').style.display = '';
+    }, 600);
+}
+
+function completeSprint(taskId) {
+    if (sprintState.timer) clearInterval(sprintState.timer);
+    sprintState = { active: false, taskId: null, startTime: null, timer: null, unfocusedSince: null, failed: false };
+
+    const today = getTodayString();
+    
+    initSprintsForDate(today);
+    
+    S.sprints[today][taskId] = { completed: true, completedAt: new Date().toISOString() };
+
+    if (!S.completedToday) S.completedToday = {};
+    if (!S.completedToday[today]) S.completedToday[today] = [];
+    if (!S.completedToday[today].includes(taskId)) {
+        S.completedToday[today].push(taskId);
+    }
+
+    saveState();
+    document.getElementById('sprint-active').style.display = 'none';
+    document.getElementById('sprint-selector').style.display = '';
+    renderSprintTasks();
+    renderSprintHistory();
+    renderDailyTasks();
+    renderHeatmap();
+    showToast('🏆 Спринт завершено! Вітаю з перемогою!');
+}
+
+function renderSprintHistory() {
+    const el = document.getElementById('sprint-history');
+    if (!el) return;
+    const today = getTodayString();
+    const completed = S.completedToday[today] || [];
+    const sprintCompleted = completed.filter(id => SPRINT_TASKS.some(t => t.id === id));
+
+    if (sprintCompleted.length === 0) {
+        el.innerHTML = '<p style="color:var(--text-tertiary); font-size:14px;">Ще немає завершених спринтів</p>';
+        return;
+    }
+
+    let html = '';
+    sprintCompleted.forEach(id => {
+        const task = SPRINT_TASKS.find(t => t.id === id);
+        if (!task) return;
+        const completedAt = S.sprints[today]?.[id]?.completedAt;
+        const time = completedAt ? new Date(completedAt).toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' }) : '';
+        html += `
+            <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--border);">
+                <span style="font-size:24px;">${task.emoji}</span>
+                <div style="flex:1;">
+                    <div style="font-weight:600;">${task.name}</div>
+                    <div style="font-size:12px; color:var(--text-tertiary);">${task.duration} хв</div>
+                </div>
+                <div style="font-size:12px; color:var(--accent);">${time} ✓</div>
+            </div>`;
+    });
+    el.innerHTML = html;
+}
+
+/* ═══════ VISIBILITY CHANGE (SPRINT ENFORCEMENT) ═══════ */
+document.addEventListener('visibilitychange', () => {
+    if (!sprintState.active) return;
+
+    if (document.hidden) {
+        sprintState.unfocusedSince = Date.now();
+        const focusEl = document.getElementById('sprint-focus');
+        focusEl.className = 'sprint-focus-indicator unfocused';
+        document.getElementById('sprint-focus-text').textContent = 'Поза фокусом!';
+    } else {
+        if (sprintState.unfocusedSince) {
+            const away = (Date.now() - sprintState.unfocusedSince) / 1000;
+            if (away > 15) {
+                failSprint();
+                return;
+            }
+        }
+        sprintState.unfocusedSince = null;
+        const focusEl = document.getElementById('sprint-focus');
+        focusEl.className = 'sprint-focus-indicator focused';
+        document.getElementById('sprint-focus-text').textContent = 'У фокусі';
+    }
+});
+
+/* ═══════ PROFILE ═══════ */
+function saveProfile() {
+    S.profile.weight = parseInt(document.getElementById('profile-weight').value) || 75;
+    S.profile.goal = document.getElementById('profile-goal').value;
+    S.profile.activity = document.getElementById('profile-activity').value;
+    saveState();
+    showToast('Профіль збережено');
+}
+
+function loadProfile() {
+    document.getElementById('profile-weight').value = S.profile.weight || 75;
+    document.getElementById('profile-goal').value = S.profile.goal || 'bulk';
+    document.getElementById('profile-activity').value = S.profile.activity || 'medium';
+}
+
+/* ═══════ SHORTCUT MODAL LOGIC ═══════ */
+function openShortcutInstructions() {
+    const modal = document.getElementById('shortcut-modal');
+    const input = document.getElementById('shortcut-webhook-url');
+    const host = window.location.origin;
+    const url = `${host}/api/wakeup/status`;
+    input.value = url;
+    modal.style.display = '';
+}
+
+function closeShortcutInstructions() {
+    document.getElementById('shortcut-modal').style.display = 'none';
+}
+
+function copyShortcutLink() {
+    const input = document.getElementById('shortcut-webhook-url');
+    input.select();
+    input.setSelectionRange(0, 99999);
+    try {
+        navigator.clipboard.writeText(input.value);
+        showToast('Webhook URL скопійовано!');
+    } catch(e) {
+        showToast('Не вдалося скопіювати автоматично', 'error');
+    }
+}
+
+/* ═══════ CHARACTER COUNTERS ═══════ */
+document.addEventListener('DOMContentLoaded', () => {
+    const quoteInput = document.getElementById('wakeup-typed-quote');
+    const reflInput = document.getElementById('wakeup-reflection');
+
+    if (quoteInput) {
+        quoteInput.addEventListener('input', () => {
+            document.getElementById('wakeup-char-counter').textContent = quoteInput.value.length + ' символів';
+        });
+    }
+    if (reflInput) {
+        reflInput.addEventListener('input', () => {
+            const count = reflInput.value.length;
+            const sentences = (reflInput.value.match(/[.!?…]+/g) || []).length;
+            document.getElementById('wakeup-reflection-counter').textContent =
+                count + ' символів · ' + sentences + '/2 речень';
+        });
+    }
+});
+
+/* ═══════ DOCUMENT READY ═══════ */
+document.addEventListener('DOMContentLoaded', async () => {
+    // Якщо запущено на localhost, видаляємо Service Worker та очищаємо кеш для миттєвого відображення змін
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                for (let r of registrations) {
+                    r.unregister();
+                }
+            });
+        }
+        if (window.caches) {
+            caches.keys().then(names => {
+                for (let n of names) {
+                    caches.delete(n);
+                }
+            });
+        }
+    }
+
+    await initApp();
+
+    // Реєструємо Service Worker тільки на продакшені (напр., Vercel)
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(e => console.log('SW:', e));
+        }
+    }
+});
+</script>
+</body>
+</html>
