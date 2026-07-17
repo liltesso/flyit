@@ -1,0 +1,156 @@
+{
+  "username": "aura_user",
+  "state": {
+    "profile": {
+      "weight": 75,
+      "goal": "bulk",
+      "activity": "medium"
+    },
+    "wakeup": {
+      "2026-07-17": {
+        "isAwake": true,
+        "quote": "Перешкода на шляху стає шляхом. Кожна труднощі — це можливість для зростання.",
+        "author": "Марк Аврелій",
+        "verifiedAt": "2026-07-17T16:36:44.084Z"
+      }
+    },
+    "meals": {
+      "2026-07-17": []
+    },
+    "sprints": {
+      "2026-07-17": {
+        "ukrainian_1": {
+          "completed": false,
+          "duration": 0
+        },
+        "ukrainian_2": {
+          "completed": false,
+          "duration": 0
+        },
+        "english_1": {
+          "completed": false,
+          "duration": 0
+        },
+        "english_2": {
+          "completed": false,
+          "duration": 0
+        },
+        "history_1": {
+          "completed": false,
+          "duration": 0
+        },
+        "history_2": {
+          "completed": false,
+          "duration": 0
+        },
+        "guitar_1": {
+          "completed": false,
+          "duration": 0
+        },
+        "guitar_2": {
+          "completed": false,
+          "duration": 0
+        }
+      }
+    },
+    "completedToday": {
+      "2026-07-17": [
+        "wakeup"
+      ]
+    },
+    "events": {},
+    "lastOpenedDate": "2026-07-17",
+    "tab": "nutrition",
+    "streak": 0,
+    "vacuumDay": 1,
+    "vacuumStart": 15,
+    "vacuumEnd": 30,
+    "wakeUpTime": "09:00",
+    "kcalTarget": 2523,
+    "proteinTarget": 184,
+    "carbsTarget": 303,
+    "fatTarget": 64,
+    "waterTarget": 2800,
+    "gender": "male",
+    "calcWeight": 80,
+    "calcHeight": 175,
+    "calcAge": 18,
+    "calcFat": 25,
+    "calcActivity": "moderately",
+    "calcGoal": "cut",
+    "waterLogged": 250,
+    "wakeUpCompleted": false,
+    "vacuumCompleted": true,
+    "showerCompleted": false,
+    "duolingoCompleted": false,
+    "studyCompleted": {
+      "english": false,
+      "ukrainian": false,
+      "history": false
+    },
+    "studyFocus": {
+      "english": "Дивитись контент, граматика та словниковий запас",
+      "ukrainian": "Правопис, культура мовлення та літературні тексти",
+      "history": "Періоди, дати, видатні постаті та історичні події"
+    },
+    "customTasks": [
+      {
+        "id": "1",
+        "name": "Прочитати 10 сторінок книги",
+        "completed": false,
+        "recurring": true
+      },
+      {
+        "id": "2",
+        "name": "Випити склянку води перед сном",
+        "completed": false,
+        "recurring": true
+      },
+      {
+        "id": "1784250463986",
+        "name": "ягода",
+        "completed": false,
+        "recurring": true
+      }
+    ],
+    "lastDependencyUseDate": "2026-07-17",
+    "workoutSets": {
+      "morning": {},
+      "evening": {}
+    },
+    "geminiKey": "",
+    "splashSeenToday": true,
+    "history": [],
+    "mealHistory": {},
+    "_saved": "2026-07-17T16:36:54.899Z",
+    "habits": {
+      "2026-07-17": {
+        "mewing_morning": false,
+        "mewing_evening": false,
+        "duolingo": false,
+        "wash_teeth": false,
+        "vacuum": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    }
+  },
+  "history": [],
+  "completedToday": {
+    "2026-07-17": [
+      "wakeup"
+    ]
+  },
+  "wakeup": {
+    "2026-07-17": {
+      "isAwake": true,
+      "verifiedAt": "2026-07-17T16:36:44.027Z",
+      "quote": "Перешкода на шляху стає шляхом. Кожна труднощі — це можливість для зростання."
+    }
+  },
+  "events": {}
+}
